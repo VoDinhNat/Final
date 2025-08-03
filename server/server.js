@@ -4,7 +4,6 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
