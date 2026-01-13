@@ -1,6 +1,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
+const dotenv = require("dotenv");
+dotenv.config();
+
+const CLIENT_SECRET_KEY = process.env.CLIENT_SECRET_KEY;
 
 //register
 const registerUser = async (req, res) => {
@@ -64,7 +68,7 @@ const loginUser = async (req, res) => {
                 email: checkUser.email,
                 userName: checkUser.userName,
             },
-            "CLIENT_SECRET_KEY",
+            CLIENT_SECRET_KEY,
             {expiresIn: "60m"}
         );
 
@@ -105,7 +109,7 @@ const authMiddleware = async (req, res, next) => {
         });
 
     try {
-        const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
+        const decoded = jwt.verify(token, CLIENT_SECRET_KEY);
         req.user = decoded;
         next();
     } catch (error) {
