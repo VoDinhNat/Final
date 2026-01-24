@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/auth";
+const BASE_URL = "http://localhost:5000/api";
 
 const initialState = {
     isAuthenticated: false,
@@ -58,59 +58,79 @@ const authSlice = createSlice({
             state.user = null;
             state.isAuthenticated = false;
           })
+          .addCase(logoutUser.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.user = null;
+            state.isAuthenticated = false;
+          });
     },
 });
 
 export const registerUser = createAsyncThunk(
-    "/auth/register",
-  
-    async (formData) => {
-      const response = await axios.post(
-        `${BASE_URL}/register`,
-        formData,
-        {
-          withCredentials: true,
-        }
-      );
-  
-      return response.data;
-    }
-  );
+  "/auth/register",
 
+  async (formData) => {
+    const response = await axios.post(
+      `${BASE_URL}/auth/register`,
+      formData,
+      {
+        withCredentials: true,
+      }
+    );
 
-  export const loginUser = createAsyncThunk(
-    "/auth/login",
-  
-    async (formData) => {
-      const response = await axios.post(
-        `${BASE_URL}/login`,
-        formData,
-        {
-          withCredentials: true,
-        }
-      );
-  
-      return response.data;
-    }
-  );
+    return response.data;
+  }
+);
 
-  export const checkAuth = createAsyncThunk(
-    "/auth/checkauth",
-  
-    async () => {
-      const response = await axios.get(
-        `${BASE_URL}/check-auth`,
-        {
-          withCredentials: true,
-          headers: {
-            "Cache-Control":
-              "no-store, no-cache, must-revalidate, proxy-revalidate",
-          },
-        }
-      );
-  
-      return response.data;
-    }
-  );
+export const loginUser = createAsyncThunk(
+  "/auth/login",
+
+  async (formData) => {
+    const response = await axios.post(
+      `${BASE_URL}/auth/login`,
+      formData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  }
+);
+
+export const checkAuth = createAsyncThunk(
+  "/auth/checkauth",
+
+  async () => {
+    const response = await axios.get(
+      `${BASE_URL}/auth/check-auth`,
+      {
+        withCredentials: true,
+        headers: {
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      }
+    );
+
+    return response.data;
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  "/auth/logout",
+
+  async () => {
+    const response = await axios.post(
+      `${BASE_URL}/auth/logout`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  }
+);
 export const { setUser, setIsAuthenticated, setToken } = authSlice.actions;
 export default authSlice.reducer;
