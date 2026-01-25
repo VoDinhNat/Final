@@ -50,3 +50,70 @@ export const loginFormControls = [
         type: "password",
     },
 ];
+
+export const addProductFormElements = [
+    {
+        label: "Product Name",
+        name: "title",
+        componentType: "input",
+        type: "text",
+        placeholder: "Enter product name (e.g., Organic Bananas)",
+    },
+    {
+        label: "Description",
+        name: "description",
+        componentType: "textarea",
+        placeholder: "Enter product description",
+    },
+    {
+        label: "Category",
+        name: "category",
+        componentType: "select",
+        options: [
+            { id: "fruits-vegetables", label: "Fruits & Veggies" },
+            { id: "meat-seafood", label: "Meat & Seafood" },
+            { id: "dairy-eggs", label: "Dairy & Eggs" },
+            { id: "beverages", label: "Beverages" },
+            { id: "pantry", label: "Pantry & Dry Goods" },
+            { id: "snacks", label: "Snacks" },
+            { id: "household", label: "Household" },
+        ],
+    },
+    {
+        label: "Brand",
+        name: "brand",
+        componentType: "select",
+        options: [
+            { id: "local-farm", label: "Local Farm / Fresh" },
+            { id: "vinamilk", label: "Vinamilk" },
+            { id: "th-true-milk", label: "TH True Milk" },
+            { id: "masan", label: "Masan (Chinsu/Nam Ngu)" },
+            { id: "acecook", label: "Acecook (Hao Hao)" },
+            { id: "coca-cola", label: "Coca-Cola" },
+            { id: "pepsi", label: "PepsiCo" },
+            { id: "nestle", label: "Nestlé" },
+            { id: "unilever", label: "Unilever (Omo/Sunlight)" },
+        ],
+    },
+    {
+        label: "Price",
+        name: "price",
+        componentType: "input",
+        type: "number",
+        placeholder: "Enter product price",
+    },
+    {
+        label: "Sale Price",
+        name: "salePrice",
+        componentType: "input",
+        type: "number",
+        placeholder: "Enter sale price (optional)",
+    },
+    {
+        label: "Total Stock",
+        name: "totalStock",
+        componentType: "input",
+        type: "number",
+        placeholder: "Enter total stock",
+    },
+];
