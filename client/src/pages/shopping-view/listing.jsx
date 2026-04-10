@@ -1,4 +1,5 @@
 import ProductFilter from "@/components/shopping-view/filter";
+import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import {Button} from "@/components/ui/button";
 import {
@@ -8,8 +9,11 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+// import {useToast} from "@/components/ui/use-toast";
+import {Toaster} from "@/components/ui/toaster.jsx";
 import {sortOptions} from "@/config";
-import {fetchAllFilteredProducts} from "@/store/shop/products-slice";
+import {addToCart, fetchCartItems} from "@/store/shop/cart-slice";
+import {fetchAllFilteredProducts, fetchProductDetails,} from "@/store/shop/products-slice";
 import {ArrowUpDownIcon} from "lucide-react";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
@@ -34,11 +38,13 @@ function ShoppingListing() {
     const {productList, productDetails} = useSelector(
         (state) => state.shopProducts
     );
+    const {cartItems} = useSelector((state) => state.shopCart);
     const {user} = useSelector((state) => state.auth);
     const [filters, setFilters] = useState({});
     const [sort, setSort] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
     const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+    const {toast} = Toaster();
 
     const categorySearchParam = searchParams.get("category");
 
@@ -180,6 +186,11 @@ function ShoppingListing() {
                         : null}
                 </div>
             </div>
+            <ProductDetailsDialog
+                open={openDetailsDialog}
+                setOpen={setOpenDetailsDialog}
+                productDetails={productDetails}
+            />
         </div>
     );
 }
