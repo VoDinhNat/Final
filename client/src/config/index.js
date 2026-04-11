@@ -169,3 +169,68 @@ export const brandOptionsMap = {
     "nestle": "Nestlé",
     "unilever": "Unilever",
 };
+
+export const addressFormControls = [
+    {
+        label: "Zipcode",
+        name: "pincode",
+        componentType: "input",
+        type: "text",
+        placeholder: "Enter your zipcode",
+    },
+    {
+        label: "City",
+        name: "city",
+        componentType: "input",
+        type: "text",
+        placeholder: "Enter your city",
+    },
+    {
+        label: "District",
+        name: "district",
+        componentType: "input",
+        type: "text",
+        placeholder: "Enter your district",
+    },
+    {
+        label: "Ward",
+        name: "ward",
+        componentType: "input",
+        type: "text",
+        placeholder: "Enter your ward",
+    },
+    {
+        label: "Street",
+        name: "street",
+        componentType: "input",
+        type: "text",
+        placeholder: "Enter your street",
+    },
+    {
+        label: "House Number",
+        name: "number",
+        componentType: "input",
+        type: "text",
+        placeholder: "Enter your house number",
+    },
+    {
+        label: "Address",
+        name: "address",
+        componentType: "input",
+        type: "text",
+        placeholder: "Enter your address",
+    },
+    {
+        label: "Phone",
+        name: "phone",
+        componentType: "input",
+        type: "text",
+        placeholder: "Enter your phone number",
+    },
+    {
+        label: "Notes",
+        name: "notes",
+        componentType: "textarea",
+        placeholder: "Enter any additional notes",
+    },
+];
