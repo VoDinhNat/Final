@@ -25,8 +25,7 @@ function Address({setCurrentSelectedAddress, selectedId}) {
     const dispatch = useDispatch();
     const {user} = useSelector((state) => state.auth);
     const {addressList} = useSelector((state) => state.shopAddress);
-    // const {toast} = useToast();
-    const {toast} = Toaster();
+    const {toast} = useToast();
 
     useEffect(() => {
         const {number, street, ward, district} = formData;
