@@ -3,7 +3,6 @@ import AdminProductTile from "@/components/admin-view/product-title";
 import CommonForm from "@/components/common/form";
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogContent, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
-// import {useToast} from "@/components/ui/use-toast";
 import {useToast} from "@/hooks/use-toast";
 import {addProductFormElements} from "@/config";
 import {addNewProduct, deleteProduct, editProduct, fetchAllProducts,} from "@/store/admin/products-slice";
@@ -35,7 +34,7 @@ function AdminProducts() {
     const {productList} = useSelector((state) => state.adminProducts);
     const dispatch = useDispatch();
     const {toast} = useToast();
-
+    
     function onSubmit(event) {
         event.preventDefault();
 
