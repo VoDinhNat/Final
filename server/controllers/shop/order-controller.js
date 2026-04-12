@@ -26,8 +26,8 @@ const createOrder = async (req, res) => {
                 payment_method: "paypal",
             },
             redirect_urls: {
-                return_url: "https://shop-furniture-three.vercel.app/shop/paypal-return",
-                cancel_url: "https://shop-furniture-three.vercel.app/shop/paypal-cancel",
+                return_url: "http://localhost:3000/shop/paypal-return",
+                cancel_url: "http://localhost:3000/shop/paypal-cancel",
             },
             transactions: [
                 {
