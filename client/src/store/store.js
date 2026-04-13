@@ -8,6 +8,7 @@ import shopAddressSlice from "./shop/address-slice";
 import shopOrderSlice from "./shop/order-slice";
 import shopReviewSlice from "./shop/review-slice";
 import commonSlice from "./common-slice";
+import adminUsersSlice from "./admin/users-slice";  
 
 
 const store = configureStore({
@@ -21,6 +22,7 @@ const store = configureStore({
         shopOrder: shopOrderSlice,
         shopReview: shopReviewSlice,
         common: commonSlice,
+        adminUsers: adminUsersSlice,
     },
 });
 
