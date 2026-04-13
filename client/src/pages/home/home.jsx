@@ -13,12 +13,20 @@ import {
     Coffee, 
     ChevronLeftIcon,
     ChevronRightIcon,
+    Home,
+    Search,
+    User,
 } from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
+import {fetchAllFilteredProducts, fetchProductDetails} from "@/store/shop/products-slice";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {addToCart, fetchCartItems} from "@/store/shop/cart-slice";
+import {useToast} from "@/hooks/use-toast";
+import ProductDetailsDialog from "@/components/shopping-view/product-details";
+import {getFeatureImages} from "@/store/common-slice";
 
 export const categoriesWithIcon = [
     { id: "fruits-vegetables", label: "Fruits & Veggies", icon: Apple },
@@ -42,30 +50,30 @@ export const brandsWithIcon = [
     { id: "unilever", label: "Unilever", icon: Sparkles },
 ];
 
-
-function ShoppingHome() {
+function HomePage() {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const {productList, productDetails} = useSelector(
-        (state) => state.shopProducts
-    );
+    const {productList, productDetails} = useSelector((state) => state.shopProducts);
     const {featureImageList} = useSelector((state) => state.common);
-
     const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-
     const {user} = useSelector((state) => state.auth);
-
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const {toast} = useToast();
+
+    const {isAuthenticated} = useSelector((state) => state.auth);
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/shop/home");
+        }
+    }, [isAuthenticated, navigate]);
 
     function handleNavigateToListingPage(getCurrentItem, section) {
         sessionStorage.removeItem("filters");
         const currentFilter = {
             [section]: [getCurrentItem.id],
         };
-
         sessionStorage.setItem("filters", JSON.stringify(currentFilter));
-        navigate(`/shop/listing`);
+        navigate(`/auth/login`);
     }
 
     function handleGetProductDetails(getCurrentProductId) {
@@ -73,6 +81,11 @@ function ShoppingHome() {
     }
 
     function handleAddtoCart(getCurrentProductId) {
+        if (!user) {
+            navigate("/auth/login");
+            return;
+        }
+
         dispatch(
             addToCart({
                 userId: user?.id,
@@ -90,7 +103,7 @@ function ShoppingHome() {
     }
 
     useEffect(() => {
-        if (productDetails !== null) setOpenDetailsDialog(true);
+        if (productDetails) setOpenDetailsDialog(true);
     }, [productDetails]);
 
     useEffect(() => {
@@ -102,12 +115,7 @@ function ShoppingHome() {
     }, [featureImageList]);
 
     useEffect(() => {
-        dispatch(
-            fetchAllFilteredProducts({
-                filterParams: {},
-                sortParams: "price-lowtohigh",
-            })
-        );
+        dispatch(fetchAllFilteredProducts({filterParams: {}, sortParams: "price-lowtohigh"}));
     }, [dispatch]);
 
     useEffect(() => {
@@ -116,28 +124,51 @@ function ShoppingHome() {
 
     return (
         <div className="flex flex-col min-h-screen">
+            <header className="sticky top-0 z-40 w-full border-b bg-background">
+                <div className="flex h-16 items-center justify-between px-4 md:px-6">
+                    <Link to="/" className="flex items-center gap-2">
+                        <Home className="h-6 w-6"/>
+                        <span className="font-bold">Furniture Shop</span>
+                    </Link>
+                    <nav className="hidden md:flex gap-6">
+                        {[...categoriesWithIcon]
+                            .sort(() => 0.5 - Math.random())
+                            .slice(0, 11)
+                            .map((category) => (
+                                <Link
+                                    key={category.id}
+                                    to={`/auth/login`}
+                                    className="no-underline font-bold"
+                                >
+                                    {category.label}
+                                </Link>
+                            ))}
+                    </nav>
+                    <div className="flex items-center space-x-2">
+                        <Button variant="outline" size="icon">
+                            <Search className="w-4 h-4"/>
+                        </Button>
+                        <Button variant="outline" size="icon" onClick={() => navigate("/auth/login")}>
+                            <User className="w-4 h-4"/>
+                        </Button>
+                    </div>
+                </div>
+            </header>
+
             <div className="relative w-full h-[600px] overflow-hidden">
-                {featureImageList && featureImageList.length > 0
-                    ? featureImageList.map((slide, index) => (
-                        <img
-                            src={slide?.image}
-                            key={index}
-                            className={`${
-                                index === currentSlide ? "opacity-100" : "opacity-0"
-                            } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
-                        />
-                    ))
-                    : null}
+                {featureImageList?.map((slide, index) => (
+                    <img
+                        src={slide?.image}
+                        key={index}
+                        className={`${
+                            index === currentSlide ? "opacity-100" : "opacity-0"
+                        } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
+                    />
+                ))}
                 <Button
                     variant="outline"
                     size="icon"
-                    onClick={() =>
-                        setCurrentSlide(
-                            (prevSlide) =>
-                                (prevSlide - 1 + featureImageList.length) %
-                                featureImageList.length
-                        )
-                    }
+                    onClick={() => setCurrentSlide((prevSlide) => (prevSlide - 1 + featureImageList.length) % featureImageList.length)}
                     className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/80"
                 >
                     <ChevronLeftIcon className="w-4 h-4"/>
@@ -145,27 +176,21 @@ function ShoppingHome() {
                 <Button
                     variant="outline"
                     size="icon"
-                    onClick={() =>
-                        setCurrentSlide(
-                            (prevSlide) => (prevSlide + 1) % featureImageList.length
-                        )
-                    }
+                    onClick={() => setCurrentSlide((prevSlide) => (prevSlide + 1) % featureImageList.length)}
                     className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/80"
                 >
                     <ChevronRightIcon className="w-4 h-4"/>
                 </Button>
             </div>
+
             <section className="py-12 bg-gray-50">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-8">
-                        Furniture by category
-                    </h2>
+                    <h2 className="text-3xl font-bold text-center mb-8">Furniture by category</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {categoriesWithIcon.map((categoryItem) => (
                             <Card
-                                onClick={() =>
-                                    handleNavigateToListingPage(categoryItem, "category")
-                                }
+                                key={categoryItem.id}
+                                onClick={() => handleNavigateToListingPage(categoryItem, "category")}
                                 className="cursor-pointer hover:shadow-lg transition-shadow"
                             >
                                 <CardContent className="flex flex-col items-center justify-center p-6">
@@ -184,6 +209,7 @@ function ShoppingHome() {
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                         {brandsWithIcon.map((brandItem) => (
                             <Card
+                                key={brandItem.id}
                                 onClick={() => handleNavigateToListingPage(brandItem, "brand")}
                                 className="cursor-pointer hover:shadow-lg transition-shadow"
                             >
@@ -198,22 +224,20 @@ function ShoppingHome() {
 
             <section className="py-12">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-8">
-                        Feature Products
-                    </h2>
+                    <h2 className="text-3xl font-bold text-center mb-8">Feature Products</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-6">
-                        {productList && productList.length > 0
-                            ? productList.map((productItem) => (
-                                <ShoppingProductTile
-                                    handleGetProductDetails={handleGetProductDetails}
-                                    product={productItem}
-                                    handleAddtoCart={handleAddtoCart}
-                                />
-                            ))
-                            : null}
+                        {productList?.map((productItem) => (
+                            <ShoppingProductTile
+                                key={productItem.id}
+                                handleGetProductDetails={handleGetProductDetails}
+                                product={productItem}
+                                handleAddtoCart={handleAddtoCart}
+                            />
+                        ))}
                     </div>
                 </div>
             </section>
+
             <ProductDetailsDialog
                 open={openDetailsDialog}
                 setOpen={setOpenDetailsDialog}
@@ -223,4 +247,4 @@ function ShoppingHome() {
     );
 }
 
-export default ShoppingHome;
+export default HomePage;
