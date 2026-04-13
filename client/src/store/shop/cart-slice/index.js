@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-const BASE_URL = "localhost:5000/api";
+const BASE_URL = "http://localhost:5000/api";
 
 const initialState = {
   cartItems: [],

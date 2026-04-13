@@ -19,6 +19,11 @@ import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import {useNavigate} from "react-router-dom";
+import {fetchAllFilteredProducts, fetchProductDetails} from "@/store/shop/products-slice";
+import {addToCart, fetchCartItems} from "@/store/shop/cart-slice";
+import {useToast} from "@/hooks/use-toast";
+import ProductDetailsDialog from "@/components/shopping-view/product-details";
+import {getFeatureImages} from "@/store/common-slice";
 
 export const categoriesWithIcon = [
     { id: "fruits-vegetables", label: "Fruits & Veggies", icon: Apple },
@@ -73,6 +78,11 @@ function ShoppingHome() {
     }
 
     function handleAddtoCart(getCurrentProductId) {
+        if (!user) {
+            navigate("/auth/login");
+            return;
+        }
+
         dispatch(
             addToCart({
                 userId: user?.id,
@@ -94,6 +104,8 @@ function ShoppingHome() {
     }, [productDetails]);
 
     useEffect(() => {
+        if (!featureImageList?.length) return undefined;
+
         const timer = setInterval(() => {
             setCurrentSlide((prevSlide) => (prevSlide + 1) % featureImageList.length);
         }, 15000);
@@ -163,6 +175,7 @@ function ShoppingHome() {
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {categoriesWithIcon.map((categoryItem) => (
                             <Card
+                                key={categoryItem.id}
                                 onClick={() =>
                                     handleNavigateToListingPage(categoryItem, "category")
                                 }
@@ -184,6 +197,7 @@ function ShoppingHome() {
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                         {brandsWithIcon.map((brandItem) => (
                             <Card
+                                key={brandItem.id}
                                 onClick={() => handleNavigateToListingPage(brandItem, "brand")}
                                 className="cursor-pointer hover:shadow-lg transition-shadow"
                             >
@@ -205,6 +219,7 @@ function ShoppingHome() {
                         {productList && productList.length > 0
                             ? productList.map((productItem) => (
                                 <ShoppingProductTile
+                                    key={productItem.id || productItem._id}
                                     handleGetProductDetails={handleGetProductDetails}
                                     product={productItem}
                                     handleAddtoCart={handleAddtoCart}

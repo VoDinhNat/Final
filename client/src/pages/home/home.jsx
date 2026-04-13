@@ -159,7 +159,7 @@ function HomePage() {
                 {featureImageList?.map((slide, index) => (
                     <img
                         src={slide?.image}
-                        key={index}
+                        key={slide?._id || slide?.id || slide?.image || index}
                         className={`${
                             index === currentSlide ? "opacity-100" : "opacity-0"
                         } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
@@ -228,7 +228,7 @@ function HomePage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-6">
                         {productList?.map((productItem) => (
                             <ShoppingProductTile
-                                key={productItem.id}
+                                key={productItem.id || productItem._id}
                                 handleGetProductDetails={handleGetProductDetails}
                                 product={productItem}
                                 handleAddtoCart={handleAddtoCart}
