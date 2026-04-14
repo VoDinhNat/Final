@@ -1,14 +1,14 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import accImg1 from "../../assets/nt1.png";
+import accImg1 from "../../assets/nt1.jpg";
 import accImg2 from "../../assets/nt2.jpg";
 import accImg3 from "../../assets/nt3.jpg";
 import accImg4 from "../../assets/nt4.jpg";
 import accImg5 from "../../assets/nt5.jpg";
 import accImg6 from "../../assets/nt6.jpg";
-import accImg7 from "../../assets/nt7.jpg";
+import accImg7 from "../../assets/nt7.avif";
 import accImg8 from "../../assets/nt8.jpg";
-import accImg9 from "../../assets/nt9.jpg";
-import accImg10 from "../../assets/nt10.jpg";
+import accImg9 from "../../assets/nt9.avif";
+import accImg10 from "../../assets/nt10.avif";
 
 import Address from "@/components/shopping-view/address";
 import ShoppingOrders from "@/components/shopping-view/orders";
