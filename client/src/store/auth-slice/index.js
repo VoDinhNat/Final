@@ -102,18 +102,27 @@ export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
 
   async () => {
-    const response = await axios.get(
-      `${BASE_URL}/auth/check-auth`,
-      {
-        withCredentials: true,
-        headers: {
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
-        },
-      }
-    );
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/auth/check-auth`,
+        {
+          withCredentials: true,
+          headers: {
+            "Cache-Control":
+              "no-store, no-cache, must-revalidate, proxy-revalidate",
+          },
+        }
+      );
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      // 401 is expected for guest users; keep app state stable.
+      if (error?.response?.status === 401) {
+        return { success: false, user: null };
+      }
+
+      throw error;
+    }
   }
 );
 

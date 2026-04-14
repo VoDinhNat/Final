@@ -26,8 +26,8 @@ const createOrder = async (req, res) => {
                 payment_method: "paypal",
             },
             redirect_urls: {
-                return_url: "http://localhost:3000/shop/paypal-return",
-                cancel_url: "http://localhost:3000/shop/paypal-cancel",
+                return_url: "http://localhost:5173/shop/paypal-return",
+                cancel_url: "http://localhost:5173/shop/paypal-cancel",
             },
             transactions: [
                 {
@@ -51,7 +51,7 @@ const createOrder = async (req, res) => {
 
         paypal.payment.create(create_payment_json, async (error, paymentInfo) => {
             if (error) {
-
+                // console.error("[PAYPAL_CREATE_ERROR]", error?.response || error);
 
                 return res.status(500).json({
                     success: false,
@@ -79,6 +79,11 @@ const createOrder = async (req, res) => {
                     (link) => link.rel === "approval_url"
                 ).href;
 
+                // console.log("[PAYPAL_CREATE_SUCCESS]", {
+                //     orderId: newlyCreatedOrder._id?.toString(),
+                //     paymentId: paymentInfo?.id,
+                //     totalAmount: newlyCreatedOrder?.totalAmount,
+                // });
                 res.status(201).json({
                     success: true,
                     approvalURL,
@@ -98,12 +103,70 @@ const capturePayment = async (req, res) => {
     try {
         const {paymentId, payerId, orderId} = req.body;
 
+        // console.log("[PAYPAL_CAPTURE_REQUEST]", {orderId, paymentId, payerId});
+
+        // if (!paymentId || !payerId || !orderId) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Missing required payment fields",
+        //     });
+        // }
         let order = await Order.findById(orderId);
 
         if (!order) {
             return res.status(404).json({
                 success: false,
                 message: "Order can not be found",
+            });
+        }
+
+        const executePaymentJson = {
+            payer_id: payerId,
+            transactions: [
+                {
+                    amount: {
+                        currency: "USD",
+                        total: Number(order.totalAmount).toFixed(2),
+                    },
+                },
+            ],
+        };
+
+        const executedPayment = await new Promise((resolve, reject) => {
+            paypal.payment.execute(
+                paymentId,
+                executePaymentJson,
+                (error, paymentResult) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(paymentResult);
+                }
+            );
+        });
+
+        const paymentState = executedPayment?.state;
+        const transaction = executedPayment?.transactions?.[0];
+        const paidAmount = Number(transaction?.amount?.total);
+        const paidCurrency = transaction?.amount?.currency;
+        const isValidAmount =
+            Number.isFinite(paidAmount) &&
+            paidAmount === Number(order.totalAmount.toFixed(2));
+
+        if (paymentState !== "approved" || !isValidAmount || paidCurrency !== "USD") {
+            console.error("[PAYPAL_CAPTURE_VALIDATION_FAILED]", {
+                orderId,
+                paymentId,
+                paymentState,
+                paidAmount,
+                paidCurrency,
+                expectedAmount: Number(order.totalAmount.toFixed(2)),
+                expectedCurrency: "USD",
+            });
+            return res.status(400).json({
+                success: false,
+                message: "Payment validation failed",
             });
         }
 
@@ -118,6 +181,13 @@ const capturePayment = async (req, res) => {
             if (!product) {
                 return res.status(404).json({
                     success: false,
+            //         message: "Product can not be found",
+            //     });
+            // }
+
+            // if (product.totalStock < item.quantity) {
+            //     return res.status(400).json({
+            //         success: false,
                     message: `Not enough stock for this product ${product.title}`,
                 });
             }
@@ -132,6 +202,13 @@ const capturePayment = async (req, res) => {
 
         await order.save();
 
+        // console.log("[PAYPAL_CAPTURE_SUCCESS]", {
+        //     orderId: order._id?.toString(),
+        //     paymentId,
+        //     payerId,
+        //     paidAmount,
+        //     paidCurrency,
+        // });
         res.status(200).json({
             success: true,
             message: "Order confirmed",

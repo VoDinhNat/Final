@@ -2,6 +2,9 @@ import {Navigate, useLocation} from "react-router-dom";
 
 function CheckAuth({isAuthenticated, user, children}) {
     const location = useLocation();
+    const isPaypalCallbackRoute =
+        location.pathname === "/shop/paypal-return" ||
+        location.pathname === "/shop/paypal-cancel";
 
     if (location.pathname === "/") {
         if (!isAuthenticated) {
@@ -17,6 +20,7 @@ function CheckAuth({isAuthenticated, user, children}) {
 
     if (
         !isAuthenticated &&
+        !isPaypalCallbackRoute &&
         !(
             location.pathname.includes("/login") ||
             location.pathname.includes("/register")

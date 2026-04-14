@@ -32,6 +32,18 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+app.use((req, res, next) => {
+    const start = Date.now();
+    const requestTag = `[HTTP] ${req.method} ${req.originalUrl}`;
+    console.log(`${requestTag} - started`);
+
+    res.on("finish", () => {
+        const duration = Date.now() - start;
+        console.log(`${requestTag} - ${res.statusCode} (${duration}ms)`);
+    });
+
+    next();
+});
 
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
