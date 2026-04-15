@@ -36,17 +36,17 @@ function AuthLogin() {
 
     return (
         <div className="mx-auto w-full max-w-md space-y-6">
-            <Link to="/" className="absolute top-4 right-4 text-xl text-green-600 hover:text-green-700 transition-colors">
+            <Link to="/" className="absolute top-4 right-4 text-xl text-primary hover:text-primary/80 transition-colors">
                 <Home />
             </Link>
             <div className="text-center">
-                <h1 className="text-3xl font-bold tracking-tight text-green-600">
+                <h1 className="text-3xl font-bold tracking-tight text-primary">
                     Sign in to your account
                 </h1>
                 <p className="mt-2 text-muted-foreground">
                     Don't have an account
                     <Link
-                        className="font-medium ml-2 text-green-600 hover:text-green-700 hover:underline transition-colors"
+                        className="font-medium ml-2 text-primary hover:text-primary/80 hover:underline transition-colors"
                         to="/auth/register"
                     >
                         Register

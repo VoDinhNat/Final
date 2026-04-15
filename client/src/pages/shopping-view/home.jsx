@@ -15,6 +15,7 @@ import {
     ChevronRightIcon,
 } from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card";
+import {Skeleton} from "@/components/ui/skeleton";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
@@ -50,7 +51,7 @@ export const brandsWithIcon = [
 
 function ShoppingHome() {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const {productList, productDetails} = useSelector(
+    const {productList, productDetails, isLoading} = useSelector(
         (state) => state.shopProducts
     );
     const {featureImageList} = useSelector((state) => state.common);
@@ -62,6 +63,53 @@ function ShoppingHome() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const {toast} = useToast();
+    const hasProducts = Array.isArray(productList) && productList.length > 0;
+    const bestSellerProducts = hasProducts
+        ? [...productList].sort((a, b) => (b?.totalStock || 0) - (a?.totalStock || 0)).slice(0, 4)
+        : [];
+    const flashDealProducts = hasProducts
+        ? productList
+            .filter((product) => Number(product?.salePrice) > 0)
+            .sort((a, b) => Number(b?.price || 0) - Number(b?.salePrice || 0) - (Number(a?.price || 0) - Number(a?.salePrice || 0)))
+            .slice(0, 4)
+        : [];
+
+    function renderProductSkeleton() {
+        return Array.from({length: 4}).map((_, index) => (
+            <Card key={`skeleton-${index}`} className="w-full">
+                <Skeleton className="h-[300px] w-full rounded-t-lg"/>
+                <CardContent className="p-4 space-y-3">
+                    <Skeleton className="h-6 w-3/4"/>
+                    <Skeleton className="h-4 w-1/2"/>
+                    <Skeleton className="h-4 w-2/3"/>
+                    <Skeleton className="h-9 w-full"/>
+                </CardContent>
+            </Card>
+        ));
+    }
+
+    function renderProductGrid(items, emptyMessage) {
+        if (isLoading) {
+            return renderProductSkeleton();
+        }
+
+        if (!items.length) {
+            return (
+                <div className="col-span-full rounded-lg border border-dashed border-border bg-secondary/20 p-10 text-center">
+                    <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+                </div>
+            );
+        }
+
+        return items.map((productItem) => (
+            <ShoppingProductTile
+                key={productItem.id || productItem._id}
+                handleGetProductDetails={handleGetProductDetails}
+                product={productItem}
+                handleAddtoCart={handleAddtoCart}
+            />
+        ));
+    }
 
     function handleNavigateToListingPage(getCurrentItem, section) {
         sessionStorage.removeItem("filters");
@@ -134,6 +182,9 @@ function ShoppingHome() {
                         <img
                             src={slide?.image}
                             key={index}
+                            loading={index === 0 ? "eager" : "lazy"}
+                            fetchPriority={index === 0 ? "high" : "auto"}
+                            decoding="async"
                             className={`${
                                 index === currentSlide ? "opacity-100" : "opacity-0"
                             } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
@@ -167,10 +218,10 @@ function ShoppingHome() {
                     <ChevronRightIcon className="w-4 h-4"/>
                 </Button>
             </div>
-            <section className="py-12 bg-gray-50">
+            <section className="py-12 bg-secondary/40">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold text-center mb-8">
-                        Furniture by category
+                        Products by category
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {categoriesWithIcon.map((categoryItem) => (
@@ -191,9 +242,9 @@ function ShoppingHome() {
                 </div>
             </section>
 
-            <section className="py-12 bg-gray-50">
+            <section className="py-12 bg-secondary/40">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-8">Furniture by Brand</h2>
+                    <h2 className="text-3xl font-bold text-center mb-8">Products by Brand</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                         {brandsWithIcon.map((brandItem) => (
                             <Card
@@ -216,16 +267,44 @@ function ShoppingHome() {
                         Feature Products
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-6">
-                        {productList && productList.length > 0
-                            ? productList.map((productItem) => (
-                                <ShoppingProductTile
-                                    key={productItem.id || productItem._id}
-                                    handleGetProductDetails={handleGetProductDetails}
-                                    product={productItem}
-                                    handleAddtoCart={handleAddtoCart}
-                                />
-                            ))
-                            : null}
+                        {renderProductGrid(
+                            productList || [],
+                            "We are refreshing the catalog. Check back in a moment."
+                        )}
+                    </div>
+                </div>
+            </section>
+
+            <section className="py-12 bg-secondary/40">
+                <div className="container mx-auto px-4">
+                    <h2 className="text-3xl font-bold text-center mb-2">
+                        Best Sellers
+                    </h2>
+                    <p className="text-center text-muted-foreground mb-8">
+                        Most stocked picks from our trusted suppliers.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {renderProductGrid(
+                            bestSellerProducts,
+                            "No best seller data yet. Add more products to surface this section."
+                        )}
+                    </div>
+                </div>
+            </section>
+
+            <section className="py-12">
+                <div className="container mx-auto px-4">
+                    <h2 className="text-3xl font-bold text-center mb-2">
+                        Flash Deals
+                    </h2>
+                    <p className="text-center text-muted-foreground mb-8">
+                        Limited-time discounted products to boost conversions.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {renderProductGrid(
+                            flashDealProducts,
+                            "No flash deals available right now."
+                        )}
                     </div>
                 </div>
             </section>

@@ -56,7 +56,7 @@ function ShoppingOrders() {
                                         <Badge
                                             className={`py-1 px-3 ${
                                                 orderItem?.orderStatus === "confirmed"
-                                                    ? "bg-green-500"
+                                                    ? "bg-primary"
                                                     : orderItem?.orderStatus === "rejected"
                                                         ? "bg-red-600"
                                                         : "bg-black"

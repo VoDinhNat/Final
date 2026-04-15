@@ -14,7 +14,9 @@ function ShoppingProductTile({
                 <div className="relative">
                     <img
                         src={product?.image}
-                        alt={product?.title}
+                        alt={product?.title || "Product image"}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-[300px] object-cover rounded-t-lg"
                     />
                     {product?.totalStock === 0 ? (

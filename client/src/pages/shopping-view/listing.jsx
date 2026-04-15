@@ -138,11 +138,11 @@ function ShoppingListing() {
     }, [productDetails]);
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 p-4 md:p-6 bg-secondary/20 min-h-[calc(100vh-4rem)]">
             <ProductFilter filters={filters} handleFilter={handleFilter}/>
-            <div className="bg-background w-full rounded-lg shadow-sm">
-                <div className="p-4 border-b flex items-center justify-between">
-                    <h2 className="text-lg font-extrabold">All Products</h2>
+            <div className="bg-card border w-full rounded-lg shadow-sm">
+                <div className="p-4 border-b bg-secondary/40 rounded-t-lg flex items-center justify-between">
+                    <h2 className="text-lg font-extrabold text-primary">All Products</h2>
                     <div className="flex items-center gap-3">
             <span className="text-muted-foreground">
               {productList?.length} Products
@@ -183,7 +183,11 @@ function ShoppingListing() {
                                 handleAddtoCart={handleAddtoCart}
                             />
                         ))
-                        : null}
+                        : (
+                            <div className="col-span-full rounded-md border border-dashed border-border bg-secondary/30 p-8 text-center text-muted-foreground">
+                                Chua co san pham phu hop bo loc. Thu bo bot filter hoac doi tu khoa tim kiem.
+                            </div>
+                        )}
                 </div>
             </div>
             <ProductDetailsDialog
