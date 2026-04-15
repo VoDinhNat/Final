@@ -60,13 +60,6 @@ function HomePage() {
     const navigate = useNavigate();
     const {toast} = useToast();
 
-    const {isAuthenticated} = useSelector((state) => state.auth);
-    useEffect(() => {
-        if (isAuthenticated) {
-            navigate("/shop/home");
-        }
-    }, [isAuthenticated, navigate]);
-
     function handleNavigateToListingPage(getCurrentItem, section) {
         sessionStorage.removeItem("filters");
         const currentFilter = {
@@ -128,7 +121,7 @@ function HomePage() {
                 <div className="flex h-16 items-center justify-between px-4 md:px-6">
                     <Link to="/" className="flex items-center gap-2">
                         <Home className="h-6 w-6"/>
-                        <span className="font-bold">Furniture Shop</span>
+                        <span className="font-bold">GreenBasket Market</span>
                     </Link>
                     <nav className="hidden md:flex gap-6">
                         {[...categoriesWithIcon]
@@ -183,9 +176,9 @@ function HomePage() {
                 </Button>
             </div>
 
-            <section className="py-12 bg-gray-50">
+            <section className="py-12 bg-secondary/40">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-8">Furniture by category</h2>
+                    <h2 className="text-3xl font-bold text-center mb-8">Products by category</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {categoriesWithIcon.map((categoryItem) => (
                             <Card
@@ -203,9 +196,9 @@ function HomePage() {
                 </div>
             </section>
 
-            <section className="py-12 bg-gray-50">
+            <section className="py-12 bg-secondary/40">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-8">Furniture by Brand</h2>
+                    <h2 className="text-3xl font-bold text-center mb-8">Products by Brand</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                         {brandsWithIcon.map((brandItem) => (
                             <Card

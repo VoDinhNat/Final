@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-
-const BASE_URL = "http://localhost:5000/api";
+import { API_BASE_URL } from "@/config/api";
 
 const initialState = {
   isLoading: false,
@@ -12,7 +11,7 @@ export const fetchAllUsers = createAsyncThunk(
   "/users/fetchAllUsers",
   async () => {
     const result = await axios.get(
-      `${BASE_URL}/admin/users/get`
+      `${API_BASE_URL}/admin/users/get`
     );
 
     return result?.data;
@@ -22,7 +21,7 @@ export const createUser = createAsyncThunk(
   "/users/createUser",
   async (userData) => {
     const result = await axios.post(
-      `${BASE_URL}/admin/users/create`,
+      `${API_BASE_URL}/admin/users/create`,
       userData,
       {
         headers: {
@@ -37,7 +36,7 @@ export const updateUser = createAsyncThunk(
   "/users/updateUser",
   async ({ id, userData }) => {
     const result = await axios.put(
-      `${BASE_URL}/admin/users/update/${id}`,
+      `${API_BASE_URL}/admin/users/update/${id}`,
       userData
     );
     return result?.data;
@@ -46,7 +45,7 @@ export const updateUser = createAsyncThunk(
 
 export const deleteUser = createAsyncThunk("/users/deleteUser", async (id) => {
   await axios.delete(
-    `${BASE_URL}/admin/users/delete/${id}`
+    `${API_BASE_URL}/admin/users/delete/${id}`
   );
   return id;
 });

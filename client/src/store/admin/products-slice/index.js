@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-
-const BASE_URL = "http://localhost:5000/api";
+import { API_BASE_URL } from "@/config/api";
 
 const initialState = {
   isLoading: false,
@@ -12,7 +11,7 @@ export const addNewProduct = createAsyncThunk(
   "/products/addnewproduct",
   async (formData) => {
     const result = await axios.post(
-      `${BASE_URL}/admin/products/add`,
+      `${API_BASE_URL}/admin/products/add`,
       formData,
       {
         headers: {
@@ -30,7 +29,7 @@ export const fetchAllProducts = createAsyncThunk(
   "/products/fetchAllProducts",
   async () => {
     const result = await axios.get(
-      `${BASE_URL}/admin/products/get`,
+      `${API_BASE_URL}/admin/products/get`,
       {
         withCredentials: true,
       }
@@ -44,7 +43,7 @@ export const editProduct = createAsyncThunk(
   "/products/editProduct",
   async ({ id, formData }) => {
     const result = await axios.put(
-      `${BASE_URL}/admin/products/edit/${id}`,
+      `${API_BASE_URL}/admin/products/edit/${id}`,
       formData,
       {
         headers: {
@@ -62,7 +61,7 @@ export const deleteProduct = createAsyncThunk(
   "/products/deleteProduct",
   async (id) => {
     const result = await axios.delete(
-      `${BASE_URL}/admin/products/delete/${id}`,
+      `${API_BASE_URL}/admin/products/delete/${id}`,
       {
         withCredentials: true,
       }
