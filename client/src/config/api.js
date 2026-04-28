@@ -2,11 +2,11 @@ const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 if (!rawApiBaseUrl) {
   console.warn(
-    "VITE_API_BASE_URL is not set. Falling back to http://localhost:5000/api."
+    "VITE_API_BASE_URL is not set. Falling back to https://final-xlvp.onrender.com/api."
   );
 }
 
-export const API_BASE_URL = (rawApiBaseUrl || "http://localhost:5000/api").replace(
+export const API_BASE_URL = (rawApiBaseUrl || "https://final-xlvp.onrender.com/api").replace(
   /\/+$/,
   ""
 );
