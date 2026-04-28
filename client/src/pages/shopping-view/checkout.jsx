@@ -3,18 +3,20 @@ import img from "../../assets/nt1.jpg";
 import {useDispatch, useSelector} from "react-redux";
 import UserCartItemsContent from "@/components/shopping-view/cart-items-content";
 import {Button} from "@/components/ui/button";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {createNewOrder} from "@/store/shop/order-slice";
 import {useToast} from "@/hooks/use-toast";
+import {useNavigate} from "react-router-dom";
 
 function ShoppingCheckout() {
     const {cartItems} = useSelector((state) => state.shopCart);
-    const {user} = useSelector((state) => state.auth);
+    const {user, isAuthenticated} = useSelector((state) => state.auth);
     const {approvalURL} = useSelector((state) => state.shopOrder);
     const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
     const [isPaymentStart, setIsPaymemntStart] = useState(false);
     const dispatch = useDispatch();
     const {toast} = useToast();
+    const navigate = useNavigate();
 
     const totalCartAmount =
         cartItems && cartItems.items && cartItems.items.length > 0
@@ -30,7 +32,12 @@ function ShoppingCheckout() {
             : 0;
 
     function handleInitiatePaypalPayment() {
-        if (cartItems.length === 0) {
+        if (!isAuthenticated || !user?.id) {
+            navigate("/auth/login?redirect=/shop/checkout");
+            return;
+        }
+
+        if (!cartItems?.items?.length) {
             toast({
                 title: "Your cart is empty. Please add items to proceed",
                 variant: "destructive",
@@ -90,6 +97,12 @@ function ShoppingCheckout() {
     if (approvalURL) {
         window.location.href = approvalURL;
     }
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate("/auth/login?redirect=/shop/checkout", {replace: true});
+        }
+    }, [isAuthenticated, navigate]);
 
     return (
         <div className="flex flex-col">

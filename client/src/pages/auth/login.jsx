@@ -4,7 +4,7 @@ import {loginFormControls} from "@/config";
 import {loginUser} from "@/store/auth-slice";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {Link} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {Home} from "lucide-react";
 
 const initialState = {
@@ -16,6 +16,10 @@ function AuthLogin() {
     const [formData, setFormData] = useState(initialState);
     const dispatch = useDispatch();
     const {toast} = useToast();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const redirectPath =
+        new URLSearchParams(location.search).get("redirect") || "/shop/home";
 
     function onSubmit(event) {
         event.preventDefault();
@@ -25,6 +29,7 @@ function AuthLogin() {
                 toast({
                     title: data?.payload?.message,
                 });
+                navigate(redirectPath, {replace: true});
             } else {
                 toast({
                     title: data?.payload?.message,

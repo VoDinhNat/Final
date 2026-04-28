@@ -125,23 +125,24 @@ function ShoppingHome() {
         dispatch(fetchProductDetails(getCurrentProductId));
     }
 
-    function handleAddtoCart(getCurrentProductId) {
-        if (!user) {
-            navigate("/auth/login");
-            return;
-        }
-
+    function handleAddtoCart(product) {
         dispatch(
             addToCart({
                 userId: user?.id,
-                productId: getCurrentProductId,
+                productId: product?._id,
                 quantity: 1,
+                product,
             })
         ).then((data) => {
             if (data?.payload?.success) {
                 dispatch(fetchCartItems(user?.id));
                 toast({
                     title: "Product is added to cart",
+                });
+            } else if (data?.payload?.message) {
+                toast({
+                    title: data.payload.message,
+                    variant: "destructive",
                 });
             }
         });

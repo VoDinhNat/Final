@@ -13,10 +13,14 @@ import accImg10 from "../../assets/nt10.avif";
 import Address from "@/components/shopping-view/address";
 import ShoppingOrders from "@/components/shopping-view/orders";
 import {useEffect, useState} from "react";
+import {useSelector} from "react-redux";
+import {useNavigate} from "react-router-dom";
 
 function ShoppingAccount() {
     const images = [accImg1, accImg2, accImg3, accImg4, accImg5, accImg6, accImg7, accImg8, accImg9, accImg10];
     const [currentImage, setCurrentImage] = useState(images[0]);
+    const {isAuthenticated} = useSelector((state) => state.auth);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -25,6 +29,12 @@ function ShoppingAccount() {
         }, 60000);
         return () => clearInterval(interval);
     }, [images]);
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate("/auth/login?redirect=/shop/account", {replace: true});
+        }
+    }, [isAuthenticated, navigate]);
 
     return (
         <div className="flex flex-col">

@@ -23,7 +23,10 @@ function UserCartItemsContent({cartItem}) {
                 const getCurrentProductIndex = productList.findIndex(
                     (product) => product._id === getCartItem?.productId
                 );
-                const getTotalStock = productList[getCurrentProductIndex].totalStock;
+                const getTotalStock =
+                    getCurrentProductIndex > -1
+                        ? productList[getCurrentProductIndex].totalStock
+                        : getCartItem?.totalStock || 0;
 
                 if (indexOfCurrentCartItem > -1) {
                     const getQuantity = getCartItems[indexOfCurrentCartItem].quantity;
@@ -52,6 +55,11 @@ function UserCartItemsContent({cartItem}) {
             if (data?.payload?.success) {
                 toast({
                     title: "Cart item is updated successfully",
+                });
+            } else if (data?.payload?.message) {
+                toast({
+                    title: data.payload.message,
+                    variant: "destructive",
                 });
             }
         });

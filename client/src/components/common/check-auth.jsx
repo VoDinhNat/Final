@@ -5,6 +5,10 @@ function CheckAuth({isAuthenticated, user, children}) {
     const isPaypalCallbackRoute =
         location.pathname === "/shop/paypal-return" ||
         location.pathname === "/shop/paypal-cancel";
+    const isProtectedShopRoute =
+        location.pathname === "/shop/checkout" ||
+        location.pathname === "/shop/account" ||
+        isPaypalCallbackRoute;
 
     if (location.pathname === "/") {
         if (!isAuthenticated) {
@@ -20,11 +24,7 @@ function CheckAuth({isAuthenticated, user, children}) {
 
     if (
         !isAuthenticated &&
-        !isPaypalCallbackRoute &&
-        !(
-            location.pathname.includes("/login") ||
-            location.pathname.includes("/register")
-        )
+        (isProtectedShopRoute || location.pathname.includes("/admin"))
     ) {
         return <Navigate to="/auth/login"/>;
     }

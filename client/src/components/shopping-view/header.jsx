@@ -16,7 +16,7 @@ import {Avatar, AvatarFallback} from "../ui/avatar";
 import {logoutUser} from "@/store/auth-slice";
 import UserCartWrapper from "./cart-wrapper";
 import {useEffect, useState} from "react";
-import {fetchCartItems} from "@/store/shop/cart-slice";
+import {fetchCartItems, syncGuestCartToServer} from "@/store/shop/cart-slice";
 import {Label} from "../ui/label";
 
 function MenuItems() {
@@ -60,7 +60,7 @@ function MenuItems() {
 }
 
 function HeaderRightContent() {
-    const {user} = useSelector((state) => state.auth);
+    const {user, isAuthenticated} = useSelector((state) => state.auth);
     const {cartItems} = useSelector((state) => state.shopCart);
     const [openCartSheet, setOpenCartSheet] = useState(false);
     const navigate = useNavigate();
@@ -71,8 +71,13 @@ function HeaderRightContent() {
     }
 
     useEffect(() => {
-        dispatch(fetchCartItems(user?.id));
-    }, [dispatch]);
+        if (isAuthenticated && user?.id) {
+            dispatch(syncGuestCartToServer(user.id));
+            return;
+        }
+
+        dispatch(fetchCartItems());
+    }, [dispatch, isAuthenticated, user?.id]);
 
     return (
         <div className="flex lg:items-center lg:flex-row flex-col gap-4">
@@ -99,28 +104,34 @@ function HeaderRightContent() {
                 />
             </Sheet>
 
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Avatar className="bg-black">
-                        <AvatarFallback className="bg-black text-white font-extrabold">
-                            {user?.userName[0].toUpperCase()}
-                        </AvatarFallback>
-                    </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="right" className="w-56">
-                    <DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
-                    <DropdownMenuSeparator/>
-                    <DropdownMenuItem onClick={() => navigate("/shop/account")}>
-                        <UserCog className="mr-2 h-4 w-4"/>
-                        Account
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator/>
-                    <DropdownMenuItem onClick={handleLogout} style={{color: "red"}}>
-                        <LogOut className="mr-2 h-4 w-4" style={{color: "red"}}/>
-                        Logout
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            {isAuthenticated && user ? (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Avatar className="bg-black">
+                            <AvatarFallback className="bg-black text-white font-extrabold">
+                                {user?.userName?.[0]?.toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="right" className="w-56">
+                        <DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
+                        <DropdownMenuSeparator/>
+                        <DropdownMenuItem onClick={() => navigate("/shop/account")}>
+                            <UserCog className="mr-2 h-4 w-4"/>
+                            Account
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator/>
+                        <DropdownMenuItem onClick={handleLogout} style={{color: "red"}}>
+                            <LogOut className="mr-2 h-4 w-4" style={{color: "red"}}/>
+                            Logout
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <Button onClick={() => navigate("/auth/login")} variant="default">
+                    Login
+                </Button>
+            )}
         </div>
     );
 }

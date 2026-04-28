@@ -26,7 +26,9 @@ function ProductDetailsDialog({open, setOpen, productDetails}) {
         setRating(getRating);
     }
 
-    function handleAddToCart(getCurrentProductId, getTotalStock) {
+    function handleAddToCart(product) {
+        const getCurrentProductId = product?._id;
+        const getTotalStock = product?.totalStock;
         let getCartItems = cartItems.items || [];
 
         if (getCartItems.length) {
@@ -50,12 +52,18 @@ function ProductDetailsDialog({open, setOpen, productDetails}) {
                 userId: user?.id,
                 productId: getCurrentProductId,
                 quantity: 1,
+                product,
             })
         ).then((data) => {
             if (data?.payload?.success) {
                 dispatch(fetchCartItems(user?.id));
                 toast({
                     title: "Product is added to cart",
+                });
+            } else if (data?.payload?.message) {
+                toast({
+                    title: data.payload.message,
+                    variant: "destructive",
                 });
             }
         });
@@ -153,12 +161,7 @@ function ProductDetailsDialog({open, setOpen, productDetails}) {
                         ) : (
                             <Button
                                 className="w-full"
-                                onClick={() =>
-                                    handleAddToCart(
-                                        productDetails?._id,
-                                        productDetails?.totalStock
-                                    )
-                                }
+                                onClick={() => handleAddToCart(productDetails)}
                             >
                                 Add to Cart
                             </Button>
