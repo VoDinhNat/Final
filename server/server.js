@@ -26,7 +26,7 @@ const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGO_URI).then(() => console.log("Connected to MongoDB")).catch((err) => console.log(err));
 
 app.use(cors({
-    origin: "https://final-xlvp.onrender.com",
+    origin: "https://final-3fhba0wg2-vonhat570-4496s-projects.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization", "Cache-Control", "Expires", "Pragma", "Set-Cookie"],
