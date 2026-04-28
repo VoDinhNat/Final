@@ -1,6 +1,8 @@
 const {imageUploadUtil} = require("../../helpers/cloudinary");
 const Product = require("../../models/Product");
 
+const normalizeString = (value = "") => value.trim();
+
 const handleImageUpload = async (req, res) => {
     try {
         const b64 = Buffer.from(req.file.buffer).toString("base64");
@@ -23,7 +25,7 @@ const handleImageUpload = async (req, res) => {
 //add a new product
 const addProduct = async (req, res) => {
     try {
-        const {
+        let {
             image,
             title,
             description,
@@ -34,6 +36,19 @@ const addProduct = async (req, res) => {
             totalStock,
             averageReview,
         } = req.body;
+
+        title = normalizeString(title);
+        description = normalizeString(description);
+        category = normalizeString(category);
+        brand = normalizeString(brand);
+        image = normalizeString(image);
+
+        if (!image || !title || !description || !category || !brand) {
+            return res.status(400).json({
+                success: false,
+                message: "Image, title, description, category and brand are required",
+            });
+        }
 
         const newlyCreatedProduct = new Product({
             image,
@@ -83,7 +98,7 @@ const fetchAllProducts = async (req, res) => {
 const editProduct = async (req, res) => {
     try {
         const {id} = req.params;
-        const {
+        let {
             image,
             title,
             description,
@@ -102,15 +117,23 @@ const editProduct = async (req, res) => {
                 message: "Product not found",
             });
 
-        findProduct.title = title || findProduct.title;
-        findProduct.description = description || findProduct.description;
-        findProduct.category = category || findProduct.category;
-        findProduct.brand = brand || findProduct.brand;
+        const normalizedTitle = typeof title === "string" ? normalizeString(title) : title;
+        const normalizedDescription =
+            typeof description === "string" ? normalizeString(description) : description;
+        const normalizedCategory =
+            typeof category === "string" ? normalizeString(category) : category;
+        const normalizedBrand = typeof brand === "string" ? normalizeString(brand) : brand;
+        const normalizedImage = typeof image === "string" ? normalizeString(image) : image;
+
+        findProduct.title = normalizedTitle || findProduct.title;
+        findProduct.description = normalizedDescription || findProduct.description;
+        findProduct.category = normalizedCategory || findProduct.category;
+        findProduct.brand = normalizedBrand || findProduct.brand;
         findProduct.price = price === "" ? 0 : price || findProduct.price;
         findProduct.salePrice =
             salePrice === "" ? 0 : salePrice || findProduct.salePrice;
         findProduct.totalStock = totalStock || findProduct.totalStock;
-        findProduct.image = image || findProduct.image;
+        findProduct.image = normalizedImage || findProduct.image;
         findProduct.averageReview = averageReview || findProduct.averageReview;
 
         await findProduct.save();

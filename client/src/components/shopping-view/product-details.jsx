@@ -114,9 +114,14 @@ function ProductDetailsDialog({open, setOpen, productDetails}) {
                 <div className="">
                     <div>
                         <h1 className="text-3xl font-extrabold">{productDetails?.title}</h1>
-                        <p className="text-muted-foreground text-2xl mb-5 mt-4">
-                            {productDetails?.description}
-                        </p>
+                        <div className="mt-4 mb-5 space-y-2">
+                            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                Description
+                            </p>
+                            <p className="text-base leading-7 text-muted-foreground whitespace-pre-line">
+                                {productDetails?.description || "No description available for this product yet."}
+                            </p>
+                        </div>
                     </div>
                     <div className="flex items-center justify-between">
                         <p

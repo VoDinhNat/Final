@@ -34,12 +34,20 @@ function AdminProducts() {
     const {productList} = useSelector((state) => state.adminProducts);
     const dispatch = useDispatch();
     const {toast} = useToast();
-    
+
+    function normalizeProductPayload(payload) {
+        return {
+            ...payload,
+            title: payload.title.trim(),
+            description: payload.description.trim(),
+        };
+    }
+
     function onSubmit(event) {
         event.preventDefault();
 
         const updatedFormData = {
-            ...formData,
+            ...normalizeProductPayload(formData),
             image: uploadedImageUrl || formData.image,
         };
 
@@ -74,7 +82,7 @@ function AdminProducts() {
             })
             : dispatch(
                 addNewProduct({
-                    ...formData,
+                    ...normalizeProductPayload(formData),
                     image: uploadedImageUrl,
                 })
             ).then((data) => {
@@ -113,7 +121,15 @@ function AdminProducts() {
     function isFormValid() {
         const formDataValid = Object.keys(formData)
             .filter((currentKey) => currentKey !== "averageReview" && currentKey !== "image")
-            .map((key) => formData[key] !== "" && formData[key] !== null)
+            .map((key) => {
+                const value = formData[key];
+
+                if (typeof value === "string") {
+                    return value.trim() !== "";
+                }
+
+                return value !== "" && value !== null;
+            })
             .every((item) => item);
         
         const imageValid = currentEditedId !== null || uploadedImageUrl !== "";

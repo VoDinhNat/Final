@@ -35,6 +35,9 @@ function ShoppingProductTile({
                 </div>
                 <CardContent className="p-4">
                     <h2 className="text-xl font-bold mb-2">{product?.title}</h2>
+                    <p className="mb-3 line-clamp-2 min-h-10 text-sm text-muted-foreground">
+                        {product?.description || "No description available."}
+                    </p>
                     <div className="flex justify-between items-center mb-2">
             <span className="text-[16px] text-muted-foreground">
               {categoryOptionsMap[product?.category]}

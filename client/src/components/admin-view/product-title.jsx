@@ -20,6 +20,9 @@ function AdminProductTile({
                 </div>
                 <CardContent>
                     <h2 className="text-xl font-bold mb-2 mt-2">{product?.title}</h2>
+                    <p className="mb-3 line-clamp-3 min-h-16 text-sm text-muted-foreground">
+                        {product?.description || "No description available."}
+                    </p>
                     <div className="flex justify-between items-center mb-2">
             <span
                 className={`${
