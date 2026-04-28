@@ -6,7 +6,7 @@ dotenv.config();
 
 const CLIENT_SECRET_KEY = process.env.CLIENT_SECRET_KEY;
 
-//register
+//register  
 const registerUser = async (req, res) => {
     const {userName, email, password} = req.body;
 
