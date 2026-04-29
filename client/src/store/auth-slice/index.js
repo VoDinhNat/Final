@@ -68,32 +68,50 @@ const authSlice = createSlice({
 export const registerUser = createAsyncThunk(
   "/auth/register",
 
-  async (formData) => {
-    const response = await axios.post(
-      `${API_BASE_URL}/auth/register`,
-      formData,
-      {
-        withCredentials: true,
-      }
-    );
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/register`,
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data || {
+          success: false,
+          message: "Registration failed. Please try again.",
+        }
+      );
+    }
   }
 );
 
 export const loginUser = createAsyncThunk(
   "/auth/login",
 
-  async (formData) => {
-    const response = await axios.post(
-      `${API_BASE_URL}/auth/login`,
-      formData,
-      {
-        withCredentials: true,
-      }
-    );
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/login`,
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data || {
+          success: false,
+          message: "Login failed. Please try again.",
+        }
+      );
+    }
   }
 );
 

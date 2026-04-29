@@ -1,15 +1,17 @@
 import {Card, CardHeader, CardTitle} from "@/components/ui/card";
 import {capturePayment} from "@/store/shop/order-slice";
 import {useEffect} from "react";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useToast} from "@/hooks/use-toast";
+import {clearCart, fetchCartItems} from "@/store/shop/cart-slice";
 
 function PaypalReturnPage() {
     const dispatch = useDispatch();
     const location = useLocation();
     const navigate = useNavigate();
     const {toast} = useToast();
+    const {user} = useSelector((state) => state.auth);
     const params = new URLSearchParams(location.search);
     const paymentId = params.get("paymentId");
     const payerId = params.get("PayerID");
@@ -29,7 +31,9 @@ function PaypalReturnPage() {
         dispatch(capturePayment({paymentId, payerId, orderId})).then((data) => {
             if (data?.payload?.success) {
                 sessionStorage.removeItem("currentOrderId");
-                window.location.href = "/shop/payment-success";
+                dispatch(clearCart());
+                dispatch(fetchCartItems(user?.id));
+                navigate("/shop/payment-success", {replace: true});
                 return;
             }
 

@@ -5,18 +5,41 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const CLIENT_SECRET_KEY = process.env.CLIENT_SECRET_KEY;
+const normalizeString = (value = "") => value.trim();
 
 //register  
 const registerUser = async (req, res) => {
-    const {userName, email, password} = req.body;
+    let {userName, email, password} = req.body;
 
     try {
-        const checkUser = await User.findOne({email});
-        if (checkUser)
-            return res.json({
+        userName = normalizeString(userName);
+        email = normalizeString(email).toLowerCase();
+        password = normalizeString(password);
+
+        if (!userName || !email || !password) {
+            return res.status(400).json({
                 success: false,
-                message: "User Already exists with the same email! Please try again",
+                message: "userName, email and password are required",
             });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 6 characters",
+            });
+        }
+
+        const checkUser = await User.findOne({
+            $or: [{email}, {userName}],
+        });
+        if (checkUser) {
+            const duplicateField = checkUser.email === email ? "email" : "userName";
+            return res.status(409).json({
+                success: false,
+                message: `User already exists with this ${duplicateField}`,
+            });
+        }
 
         const hashPassword = await bcrypt.hash(password, 12);
         const newUser = new User({
@@ -31,10 +54,18 @@ const registerUser = async (req, res) => {
             message: "Registration successful",
         });
     } catch (e) {
+        if (e?.code === 11000) {
+            const duplicateField = Object.keys(e.keyPattern || {})[0] || "field";
+            return res.status(409).json({
+                success: false,
+                message: `User already exists with this ${duplicateField}`,
+            });
+        }
+        console.error("[AUTH_REGISTER_ERROR]", e);
 
         res.status(500).json({
             success: false,
-            message: "Some error occured",
+            message: "Unable to register user",
         });
     }
 };
