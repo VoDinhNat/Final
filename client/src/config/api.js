@@ -1,12 +1,18 @@
 const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const defaultDevApiBaseUrl = "http://localhost:5000/api";
+const defaultProdApiBaseUrl =
+  typeof window !== "undefined" ? `${window.location.origin}/api` : "";
+const defaultApiBaseUrl = import.meta.env.DEV
+  ? defaultDevApiBaseUrl
+  : defaultProdApiBaseUrl;
 
 if (!rawApiBaseUrl) {
   console.warn(
-    "VITE_API_BASE_URL is not set. Falling back to https://final-xlvp.onrender.com/api."
+    `VITE_API_BASE_URL is not set. Falling back to ${defaultApiBaseUrl}.`
   );
 }
 
-export const API_BASE_URL = (rawApiBaseUrl || "https://final-xlvp.onrender.com/api").replace(
+export const API_BASE_URL = (rawApiBaseUrl || defaultApiBaseUrl).replace(
   /\/+$/,
   ""
 );
