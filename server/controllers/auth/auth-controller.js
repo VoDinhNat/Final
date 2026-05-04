@@ -7,6 +7,16 @@ dotenv.config();
 const CLIENT_SECRET_KEY = process.env.CLIENT_SECRET_KEY;
 const normalizeString = (value = "") => value.trim();
 
+const authCookieBase =
+    process.env.NODE_ENV === "production"
+        ? {httpOnly: true, secure: true, sameSite: "none", maxAge: 60 * 60 * 1000}
+        : {httpOnly: true, secure: false, sameSite: "lax"};
+
+function authCookieClearOptions() {
+    const {maxAge, ...rest} = authCookieBase;
+    return {...rest, path: "/"};
+}
+
 //register  
 const registerUser = async (req, res) => {
     let {userName, email, password} = req.body;
@@ -103,7 +113,7 @@ const loginUser = async (req, res) => {
             {expiresIn: "60m"}
         );
 
-        res.cookie("token", token, {httpOnly: true, secure: false}).json({
+        res.cookie("token", token, {...authCookieBase, path: "/"}).json({
             success: true,
             message: "Logged in successfully",
             user: {
@@ -124,7 +134,7 @@ const loginUser = async (req, res) => {
 
 //logout
 const logoutUser = (req, res) => {
-    res.clearCookie("token").json({
+    res.clearCookie("token", authCookieClearOptions()).json({
         success: true,
         message: "Logged out successfully!",
     });
