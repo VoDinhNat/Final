@@ -26,13 +26,18 @@ const DEFAULT_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ];
+const clientBaseUrl = (process.env.CLIENT_BASE_URL || "").trim();
 
 const envAllowedOrigins = (process.env.CORS_ORIGINS || "")
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-const allowedOrigins = [...new Set([...DEFAULT_ALLOWED_ORIGINS, ...envAllowedOrigins])];
+const allowedOrigins = [
+    ...new Set(
+        [...DEFAULT_ALLOWED_ORIGINS, ...envAllowedOrigins, clientBaseUrl].filter(Boolean)
+    ),
+];
 
 mongoose.connect(process.env.MONGO_URI).then(() => console.log("Connected to MongoDB")).catch((err) => console.log(err));
 
