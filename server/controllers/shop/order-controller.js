@@ -3,8 +3,20 @@ const Order = require("../../models/Order");
 const Cart = require("../../models/Cart");
 const Product = require("../../models/Product");
 
+const CLIENT_BASE_URL = (process.env.CLIENT_BASE_URL || "http://localhost:5173").replace(
+    /\/+$/,
+    ""
+);
+
 const createOrder = async (req, res) => {
     try {
+        if (process.env.NODE_ENV === "production" && !process.env.CLIENT_BASE_URL) {
+            return res.status(500).json({
+                success: false,
+                message: "Server misconfigured: CLIENT_BASE_URL is required in production.",
+            });
+        }
+
         const {
             userId,
             cartItems,
@@ -26,8 +38,8 @@ const createOrder = async (req, res) => {
                 payment_method: "paypal",
             },
             redirect_urls: {
-                return_url: "http://localhost:5173/shop/paypal-return",
-                cancel_url: "http://localhost:5173/shop/paypal-cancel",
+                return_url: `${CLIENT_BASE_URL}/shop/paypal-return`,
+                cancel_url: `${CLIENT_BASE_URL}/shop/paypal-cancel`,
             },
             transactions: [
                 {
