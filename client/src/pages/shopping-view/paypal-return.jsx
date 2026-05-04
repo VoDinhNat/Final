@@ -32,7 +32,9 @@ function PaypalReturnPage() {
             if (data?.payload?.success) {
                 sessionStorage.removeItem("currentOrderId");
                 dispatch(clearCart());
-                dispatch(fetchCartItems(user?.id));
+                if (user?.id) {
+                    dispatch(fetchCartItems(user.id));
+                }
                 navigate("/shop/payment-success", {replace: true});
                 return;
             }
@@ -43,7 +45,7 @@ function PaypalReturnPage() {
             });
             navigate("/shop/checkout");
         });
-    }, [paymentId, payerId, dispatch, navigate, toast]);
+    }, [paymentId, payerId, dispatch, navigate, toast, user?.id]);
 
     return (
         <Card>
