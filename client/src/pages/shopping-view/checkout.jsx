@@ -83,6 +83,8 @@ function ShoppingCheckout() {
             orderUpdateDate: new Date(),
             paymentId: "",
             payerId: "",
+            clientOrigin:
+                typeof window !== "undefined" ? window.location.origin : "",
         };
 
         dispatch(createNewOrder(orderData)).then((data) => {
