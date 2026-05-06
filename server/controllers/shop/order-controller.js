@@ -7,6 +7,34 @@ const CLIENT_BASE_URL = (process.env.CLIENT_BASE_URL || "http://localhost:5173")
     /\/+$/,
     ""
 );
+const DEFAULT_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"];
+const ALLOWED_RETURN_ORIGINS = new Set(
+    [
+        ...DEFAULT_ALLOWED_ORIGINS,
+        ...(process.env.CORS_ORIGINS || "")
+            .split(",")
+            .map((origin) => origin.trim())
+            .filter(Boolean),
+        CLIENT_BASE_URL,
+    ].filter(Boolean)
+);
+
+const normalizeOrigin = (value) => (value || "").trim().replace(/\/+$/, "");
+
+const getPaypalReturnBaseUrl = (req, clientOrigin) => {
+    const safeClientOrigin = normalizeOrigin(clientOrigin);
+    if (safeClientOrigin && ALLOWED_RETURN_ORIGINS.has(safeClientOrigin)) {
+        return safeClientOrigin;
+    }
+
+    const requestOrigin = normalizeOrigin(req.headers.origin);
+
+    if (requestOrigin && ALLOWED_RETURN_ORIGINS.has(requestOrigin)) {
+        return requestOrigin;
+    }
+
+    return CLIENT_BASE_URL;
+};
 
 const createOrder = async (req, res) => {
     try {
@@ -30,7 +58,9 @@ const createOrder = async (req, res) => {
             paymentId,
             payerId,
             cartId,
+            clientOrigin,
         } = req.body;
+        const paypalReturnBaseUrl = getPaypalReturnBaseUrl(req, clientOrigin);
 
         const create_payment_json = {
             intent: "sale",
@@ -38,8 +68,8 @@ const createOrder = async (req, res) => {
                 payment_method: "paypal",
             },
             redirect_urls: {
-                return_url: `${CLIENT_BASE_URL}/shop/paypal-return`,
-                cancel_url: `${CLIENT_BASE_URL}/shop/paypal-cancel`,
+                return_url: `${paypalReturnBaseUrl}/shop/paypal-return`,
+                cancel_url: `${paypalReturnBaseUrl}/shop/paypal-cancel`,
             },
             transactions: [
                 {
