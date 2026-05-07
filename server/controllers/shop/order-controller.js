@@ -7,7 +7,7 @@ const CLIENT_BASE_URL = (process.env.CLIENT_BASE_URL || "http://localhost:5173")
     /\/+$/,
     ""
 );
-const DEFAULT_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "https://final-3fhba0wg2-vonhat570-4496s-projects.vercel.app"];
+const DEFAULT_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "https://final-3fhba0wg2-vonhat570-4496s-projects.vercel.app", "https://final-sigma-two.vercel.app"];
 const ALLOWED_RETURN_ORIGINS = new Set(
     [
         ...DEFAULT_ALLOWED_ORIGINS,
