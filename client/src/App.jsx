@@ -1,4 +1,4 @@
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import AuthLayout from "./components/auth/layout";
 import AuthLogin from "./pages/auth/login";
 import AuthRegister from "./pages/auth/register";
@@ -30,10 +30,32 @@ function App() {
         (state) => state.auth
     );
     const dispatch = useDispatch();
+    const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         dispatch(checkAuth());
     }, [dispatch]);
+
+    useEffect(() => {
+        // Handle PayPal callback from "/" to avoid direct deep-link reload issues on SPA hosts.
+        if (location.pathname !== "/") return;
+
+        const params = new URLSearchParams(location.search);
+        const hasPaypalReturn = params.get("paypal_return") === "1";
+        const hasPaypalCancel = params.get("paypal_cancel") === "1";
+        const paymentId = params.get("paymentId");
+        const payerId = params.get("PayerID");
+
+        if (hasPaypalReturn && paymentId && payerId) {
+            navigate(`/shop/paypal-return${location.search}`, {replace: true});
+            return;
+        }
+
+        if (hasPaypalCancel) {
+            navigate("/shop/paypal-cancel", {replace: true});
+        }
+    }, [location.pathname, location.search, navigate]);
 
     if (isLoading) return <Skeleton className="w-[800] bg-black h-[600px]"/>;
 
